@@ -1,0 +1,204 @@
+definitions:
+  todo-api_internal_dto.CreateTaskRequest:
+    properties:
+      date:
+        description: '"2006-01-02"'
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      title:
+        maxLength: 255
+        type: string
+    required:
+    - date
+    - title
+    type: object
+  todo-api_internal_dto.Response:
+    description: Стандартная модель ответа сервера на запрос
+    properties:
+      data:
+        type: object
+      message:
+        type: string
+      status:
+        type: string
+    type: object
+  todo-api_internal_dto.UpdateTaskRequest:
+    properties:
+      completed:
+        type: boolean
+      date:
+        description: '"2006-01-02"'
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      title:
+        maxLength: 255
+        minLength: 3
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /tasks/create:
+    post:
+      consumes:
+      - application/json
+      description: Add a new task to the system
+      parameters:
+      - description: Task creation data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/todo-api_internal_dto.CreateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Task created successfully
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "400":
+          description: Invalid input data
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+      summary: Create a new task
+      tags:
+      - tasks
+  /tasks/delete/{id}:
+    delete:
+      description: Delete a task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Task deleted successfully
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+      summary: Delete a task
+      tags:
+      - tasks
+  /tasks/get/{id}:
+    get:
+      description: Get a single task by its ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task retrieved successfully
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+      summary: Get task by ID
+      tags:
+      - tasks
+  /tasks/list:
+    get:
+      description: Get a list of tasks with optional filtering
+      parameters:
+      - description: Filter by completion status
+        in: query
+        name: completed
+        type: boolean
+      - description: 'Filter by start date (format: 2006-01-02)'
+        in: query
+        name: date_from
+        type: string
+      - description: 'Filter by end date (format: 2006-01-02)'
+        in: query
+        name: date_to
+        type: string
+      - description: 'Limit number of results (default: 10)'
+        in: query
+        name: limit
+        type: integer
+      - description: Offset for pagination
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Tasks retrieved successfully
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "400":
+          description: Invalid filter parameters
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+      summary: List all tasks
+      tags:
+      - tasks
+  /tasks/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update an existing task by ID
+      parameters:
+      - description: Task ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Task update data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/todo-api_internal_dto.UpdateTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Task updated successfully
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "400":
+          description: Invalid input data or no fields to update
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/todo-api_internal_dto.Response'
+      summary: Update a task
+      tags:
+      - tasks
+swagger: "2.0"
